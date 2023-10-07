@@ -70,41 +70,15 @@ class GetWeatherRequest():
             return weather
 
 
-class CheckCityExisting():
+class CheckCityExisting(GetWeatherRequest):
     """
     Проверка наличия города (запросом к серверу погоды)
     """
+    def get_weather_from_response(self):
+        pass
 
-    def __init__(self):
-        """
-        Инициализирует класс
-        """
-        self.session = requests.Session()
-
-    def get_weather_url(self, city):
-        """
-        Генерирует url включая в него необходимые параметры
-        Args:
-            city: Город
-        Returns:
-
-        """
-        url = 'https://api.openweathermap.org/data/2.5/weather'
-        url += '?units=metric'
-        url += '&q=' + city
-        url += '&appid=' + WEATHER_API_KEY
-        return url
-
-    def send_request(self, url):
-        """
-        Отправляет запрос на сервер
-        Args:
-            url: Адрес запроса
-        Returns:
-
-        """
-        r = self.session.get(url)
-        return r
+    def get_weather(self):
+        pass
 
     def check_existing(self, city):
         """
