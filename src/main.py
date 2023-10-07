@@ -104,7 +104,7 @@ def picnic_add(picnic: PicnicInSchema, session: Session = Depends(get_session)):
     
     session.add(picnic_object)
     session.commit()
-    
+
     return {
         'id': picnic_object.id,
         'city': city.name,
@@ -112,12 +112,22 @@ def picnic_add(picnic: PicnicInSchema, session: Session = Depends(get_session)):
     }
 
 
-@app.get('/picnic-register/', summary='Picnic Registration', tags=['picnic'])
-def register_to_picnic(*_, **__,):
+@app.post('/picnic-register/', summary='Picnic Registration', tags=['picnic'], response_model=PicnicRegistrationSchema)
+def register_to_picnic(registration_data: PicnicRegistrationSchema, session: Session = Depends(get_session)):
     """
     Регистрация пользователя на пикник
     (Этот эндпойнт необходимо реализовать в процессе выполнения тестового задания)
     """
-    # TODO: Сделать логику
-    return ...
+    user = session.query(User).get(registration_data.user_id)
+    picnic = session.query(Picnic).get(registration_data.picnic_id)
+    registration_object = PicnicRegistration(**registration_data.dict())
 
+    if not user or not picnic:
+        raise HTTPException(status_code=400, detail='User and Picnic must be in DB')
+
+    session.add(registration_object)
+    session.commit()
+
+    return PicnicRegistrationSchema.from_orm(registration_object)
+
+    

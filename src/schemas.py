@@ -41,7 +41,14 @@ class PicnicOutSchema(BaseModel):
     id: int
     city: str
     time: dt.datetime
-    
+
     class Config:
         orm_mode = True
+        from_attributes = True
+
+class PicnicRegistrationSchema(BaseModel):
+    user_id: int
+    picnic_id: int
+
+    class Config:
         from_attributes = True
