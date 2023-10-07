@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 class CityOutSchema(BaseModel):
     id: int
@@ -8,19 +8,24 @@ class CityOutSchema(BaseModel):
     class Config:
         orm_mode = True
 
-class RegisterUserRequest(BaseModel):
+class RegisterUserRequestSchema(BaseModel):
     name: str
     surname: str
     age: int
 
-
-class UserModel(BaseModel):
+    @validator('age')
+    def age_valid(cls, age):
+        if age < 0 or age > 150:
+            raise ValueError("Age must be greater than 0 and less than 150!")
+        return age
+    
+class UserModelSchema(RegisterUserRequestSchema):
     id: int
-    name: str
-    surname: str
-    age: int
 
     class Config:
         orm_mode = True
+        from_attributes = True
+
+
 
 

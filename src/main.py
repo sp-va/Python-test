@@ -5,7 +5,7 @@ from typing import Union
 from src.models import City, User, Picnic, PicnicRegistration
 from src.database import engine, Session, Base, get_session
 from src.external_requests import CheckCityExisting, GetWeatherRequest
-from src.schemas import CityOutSchema, RegisterUserRequest, UserModel
+from src.schemas import CityOutSchema, RegisterUserRequestSchema, UserModelSchema
 
 app = FastAPI()
 
@@ -44,31 +44,24 @@ def cities_list(q: str = Query(description="Название города", defa
         return cities
 
 
-@app.post('/users-list/', summary='')
-def users_list():
+@app.get('/users-list/', summary='Get users list', response_model=list[UserModelSchema])
+def users_list(min_age: int = 0, max_age: int = 200, session: Session = Depends(get_session)):
     """
     Список пользователей
     """
-    users = Session().query(User).all()
-    return [{
-        'id': user.id,
-        'name': user.name,
-        'surname': user.surname,
-        'age': user.age,
-    } for user in users]
+    users = session.query(User).filter(min_age < User.age, User.age < max_age).all()
+    return users
 
 
-@app.post('/register-user/', summary='CreateUser', response_model=UserModel)
-def register_user(user: RegisterUserRequest):
+@app.post('/register-user/', summary='CreateUser', response_model=UserModelSchema)
+def register_user(user: RegisterUserRequestSchema, session: Session = Depends(get_session)):
     """
     Регистрация пользователя
     """
     user_object = User(**user.dict())
-    s = Session()
-    s.add(user_object)
-    s.commit()
-
-    return UserModel.from_orm(user_object)
+    session.add(user_object)
+    session.commit()
+    return UserModelSchema.from_orm(user_object)
 
 
 @app.get('/all-picnics/', summary='All Picnics', tags=['picnic'])
