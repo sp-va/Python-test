@@ -3,9 +3,9 @@ from fastapi import FastAPI, HTTPException, Query, Depends
 from typing import Union
 
 from src.models import City, User, Picnic, PicnicRegistration
-from src.database import engine, Session, Base, get_session
+from src.database import Session, get_session
 from src.external_requests import CheckCityExisting, GetWeatherRequest
-from src.schemas import CityOutSchema, RegisterUserRequestSchema, UserModelSchema
+from src.schemas import *
 
 app = FastAPI()
 
@@ -49,8 +49,11 @@ def users_list(min_age: int = 0, max_age: int = 200, session: Session = Depends(
     """
     Список пользователей
     """
-    users = session.query(User).filter(min_age < User.age, User.age < max_age).all()
-    return users
+    if min_age < max_age:
+        users = session.query(User).filter(min_age < User.age, User.age < max_age).all()
+        return users
+    else:
+        raise HTTPException(status_code=404, detail='Minimal age must be less than maximum age!')
 
 
 @app.post('/register-user/', summary='CreateUser', response_model=UserModelSchema)
@@ -91,17 +94,21 @@ def all_picnics(datetime: dt.datetime = Query(default=None, description='Вре�
     } for pic in picnics]
 
 
-@app.get('/picnic-add/', summary='Picnic Add', tags=['picnic'])
-def picnic_add(city_id: int = None, datetime: dt.datetime = None):
-    p = Picnic(city_id=city_id, time=datetime)
-    s = Session()
-    s.add(p)
-    s.commit()
+@app.post('/picnic-add/', summary='Picnic Add', tags=['picnic'], response_model=PicnicOutSchema)
+def picnic_add(picnic: PicnicInSchema, session: Session = Depends(get_session)):
+    picnic_object = Picnic(**picnic.dict())
+    city = session.query(City).get(picnic.city_id)
 
+    if not city:
+        raise HTTPException(status_code=400, detail=f'City with id {picnic.city_id} is not in DB')
+    
+    session.add(picnic_object)
+    session.commit()
+    
     return {
-        'id': p.id,
-        'city': Session().query(City).filter(City.id == p.id).first().name,
-        'time': p.time,
+        'id': picnic_object.id,
+        'city': city.name,
+        'time': picnic_object.time,
     }
 
 

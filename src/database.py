@@ -1,7 +1,6 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
-from src.external_requests import GetWeatherRequest
+from sqlalchemy.orm import sessionmaker
 
 # Создание сессии
 SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
