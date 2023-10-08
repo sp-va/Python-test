@@ -8,3 +8,5 @@ class CityOutSchema(BaseModel):
     class Config:
         orm_mode = True
 
+class CityAddSchema(BaseModel):
+    name: str

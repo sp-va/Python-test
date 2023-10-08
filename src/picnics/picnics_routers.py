@@ -11,7 +11,7 @@ router = APIRouter(
     tags=['picnics'],
 )
 
-@router.post('/add/', summary='Picnic Add', response_model=PicnicOutSchema)
+@router.post('/add/', summary='Picnic Add', response_model=SinglePicnicOutSchema)
 def picnic_add(picnic: PicnicInSchema, session: Session = Depends(get_session)):
     picnic_object = Picnic(**picnic.dict())
     city = session.query(City).get(picnic.city_id)
@@ -28,7 +28,7 @@ def picnic_add(picnic: PicnicInSchema, session: Session = Depends(get_session)):
         'time': picnic_object.time,
     }
 
-@router.get('/get/', summary='All Picnics')
+@router.get('/get/', summary='All Picnics', response_model=ManyPicnicsOutSchema)
 def all_picnics(datetime: dt.datetime = Query(default=None, description='Время пикника (по умолчанию не задано)'),
                 past: bool = Query(default=True, description='Включая уже прошедшие пикники')):
     """

@@ -1,6 +1,8 @@
 from pydantic import BaseModel, validator
 import datetime as dt
 
+from src.users.schemas import UserModelSchema
+
 class PicnicInSchema(BaseModel):
     city_id: int
     time: dt.datetime
@@ -11,7 +13,7 @@ class PicnicInSchema(BaseModel):
             raise ValueError('You cannot create picnic in past')
         return time
     
-class PicnicOutSchema(BaseModel):
+class SinglePicnicOutSchema(BaseModel):
     id: int
     city: str
     time: dt.datetime
@@ -19,3 +21,5 @@ class PicnicOutSchema(BaseModel):
     class Config:
         orm_mode = True
         from_attributes = True
+class ManyPicnicsOutSchema(SinglePicnicOutSchema,):
+    users: list[UserModelSchema]
