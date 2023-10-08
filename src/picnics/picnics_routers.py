@@ -1,8 +1,12 @@
+from typing import Union
 from fastapi import APIRouter, HTTPException, Query, Depends
+from sqlalchemy.orm import joinedload
+from sqlalchemy import union_all
 
 from src.picnics.schemas import *
 from src.picnics.models import *
 from src.cities.models import *
+from src.users.models import *
 from src.registration.models import *
 from src.database import Session, get_session
 
@@ -28,28 +32,36 @@ def picnic_add(picnic: PicnicInSchema, session: Session = Depends(get_session)):
         'time': picnic_object.time,
     }
 
-@router.get('/get/', summary='All Picnics', response_model=ManyPicnicsOutSchema)
-def all_picnics(datetime: dt.datetime = Query(default=None, description='Время пикника (по умолчанию не задано)'),
-                past: bool = Query(default=True, description='Включая уже прошедшие пикники')):
+@router.get('/get/', summary='All Picnics', response_model=list[ManyPicnicsOutSchema])
+def all_picnics(picnic_datetime: dt.datetime = Query(default=None, description='Время пикника (по умолчанию не задано)'),
+                past: bool = Query(default=True, description='Включая уже прошедшие пикники'), session: Session = Depends(get_session)):
     """
     Список всех пикников
     """
-    picnics = Session().query(Picnic)
-    if datetime is not None:
-        picnics = picnics.filter(Picnic.time == datetime)
-    if not past:
-        picnics = picnics.filter(Picnic.time >= dt.datetime.now())
+    picnics = session.query(Picnic).options(joinedload(Picnic.city), joinedload(Picnic.users))
+    filter_1 = False
+    filter_2 = False
+
+    if past:
+        filter_1 = Picnic.time <= dt.datetime.now()
+    if picnic_datetime:
+        filter_2 = Picnic.time == picnic_datetime
+
+    query_1 = picnics.filter(filter_1)
+    query_2 = picnics.filter(filter_2)
+    picnics = query_1.union_all(query_2)
+    picnics = picnics.all()
 
     return [{
-        'id': pic.id,
-        'city': Session().query(City).filter(City.id == pic.id).first().name,
-        'time': pic.time,
+        'id': obj.id,
+        'city': obj.city.name,
+        'time': obj.time,
         'users': [
             {
-                'id': pr.user.id,
-                'name': pr.user.name,
-                'surname': pr.user.surname,
-                'age': pr.user.age,
-            }
-            for pr in Session().query(PicnicRegistration).filter(PicnicRegistration.picnic_id == pic.id)],
-    } for pic in picnics]
+                'name': u.user.name,
+                'surname': u.user.surname,
+                'age': u.user.age,
+                'id': u.user.id,
+            } for u in obj.users
+        ]
+    } for obj in picnics]

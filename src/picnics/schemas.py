@@ -1,5 +1,6 @@
 from pydantic import BaseModel, validator
 import datetime as dt
+from typing import List, Union
 
 from src.users.schemas import UserModelSchema
 
@@ -21,5 +22,6 @@ class SinglePicnicOutSchema(BaseModel):
     class Config:
         orm_mode = True
         from_attributes = True
+
 class ManyPicnicsOutSchema(SinglePicnicOutSchema,):
-    users: list[UserModelSchema]
+    users: List[UserModelSchema] = [] 
