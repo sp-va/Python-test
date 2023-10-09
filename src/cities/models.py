@@ -25,4 +25,4 @@ class City(Base):
     def __repr__(self):
         return f'<Город "{self.name}">'
 
-    Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
