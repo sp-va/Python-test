@@ -5,6 +5,7 @@ from src.cities.models import City
 from src.cities.schemas import *
 from src.utils.external_requests import CheckCityExisting
 from src.database import Session, get_session
+from src.logger import app_logger
 
 router = APIRouter(
     prefix='/cities',
@@ -26,7 +27,7 @@ def create_city(city: CityAddSchema, session: Session = Depends(get_session)):
         city_object = City(name=city.name.capitalize())
         session.add(city_object)
         session.commit()
-
+    app_logger.info('New City was has been added to DB')
     return city_object
 
 @router.get('/get/', summary='Get Cities', response_model=Union[CityOutSchema, List[CityOutSchema]])
