@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends
+from typing import List
 
 from src.users.models import *
 from src.users.schemas import *
@@ -9,7 +10,7 @@ router = APIRouter(
     tags=['users'],
 )
 
-@router.get('/get/', summary='Get users list', response_model=list[UserModelSchema])
+@router.get('/get/', summary='Get users list', response_model=List[UserModelSchema])
 def users_list(min_age: int = 0, max_age: int = 200, session: Session = Depends(get_session)):
     """
     Список пользователей

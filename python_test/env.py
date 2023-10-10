@@ -5,26 +5,25 @@ from sqlalchemy import pool
 
 from alembic import context
 
-import dotenv
-
 from src.database import Base
 from src.cities.models import *
 from src.picnics.models import *
 from src.users.models import *
 from src.registration.models import *
+from src.config import settings
 
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 
-env_dict = dotenv.dotenv_values('.env')
 config = context.config
 section = config.config_ini_section
-config.set_section_option(section, 'DATABASE_USER', env_dict["DATABASE_USER"])
-config.set_section_option(section, 'DATABASE_PASSWORD', env_dict["DATABASE_PASSWORD"])
-config.set_section_option(section, 'DATABASE_HOST', env_dict["DATABASE_HOST"])
-config.set_section_option(section, 'DATABASE_PORT', env_dict["DATABASE_PORT"])
-config.set_section_option(section, 'DATABASE_NAME', env_dict["DATABASE_NAME"])
+config.set_section_option(section, 'DATABASE_USER', settings.DATABASE_USER)
+config.set_section_option(section, 'DATABASE_PASSWORD', settings.DATABASE_PASSWORD)
+config.set_section_option(section, 'DATABASE_HOST', settings.DATABASE_HOST)
+config.set_section_option(section, 'DATABASE_PORT', settings.DATABASE_PORT)
+config.set_section_option(section, 'DATABASE_NAME', settings.DATABASE_NAME)
+
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

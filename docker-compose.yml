@@ -13,8 +13,8 @@ services:
       - DATABASE_PORT=5432
       - DATABASE_NAME=testcrt
       - DATABASE_USER=postgres
-      - DATABASE_PASSWORD=password
-    command: "uvicorn main:app --host 0.0.0.0 --port 8000"
+      - DATABASE_PASSWORD=qwer
+    command: "uvicorn src.main:app --host 0.0.0.0 --port 8000"
     ports:
     - 8000:8000
     networks:
@@ -28,7 +28,7 @@ services:
     environment:
       - POSTGRES_DB=testcrt
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
+      - POSTGRES_PASSWORD=qwer
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:

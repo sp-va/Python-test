@@ -1,4 +1,4 @@
-from typing import Union
+from typing import List
 from fastapi import APIRouter, HTTPException, Query, Depends
 from sqlalchemy.orm import joinedload
 from sqlalchemy import union_all
@@ -32,7 +32,7 @@ def picnic_add(picnic: PicnicInSchema, session: Session = Depends(get_session)):
         'time': picnic_object.time,
     }
 
-@router.get('/get/', summary='All Picnics', response_model=list[ManyPicnicsOutSchema])
+@router.get('/get/', summary='All Picnics', response_model=List[ManyPicnicsOutSchema])
 def all_picnics(picnic_datetime: dt.datetime = Query(default=None, description='Время пикника (по умолчанию не задано)'),
                 past: bool = Query(default=True, description='Включая уже прошедшие пикники'), session: Session = Depends(get_session)):
     """

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query, Depends
-from typing import Union
+from typing import Union, List
 
 from src.cities.models import City
 from src.cities.schemas import *
@@ -29,7 +29,7 @@ def create_city(city: CityAddSchema, session: Session = Depends(get_session)):
 
     return city_object
 
-@router.get('/get/', summary='Get Cities', response_model=Union[CityOutSchema, list[CityOutSchema]])
+@router.get('/get/', summary='Get Cities', response_model=Union[CityOutSchema, List[CityOutSchema]])
 def cities_list(q: str = Query(description="Название города", default=None), session: Session = Depends(get_session)):
     """
     Получение списка городов
