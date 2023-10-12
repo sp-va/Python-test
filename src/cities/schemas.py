@@ -6,7 +6,7 @@ class CityOutSchema(BaseModel):
     weather: float
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class CityAddSchema(BaseModel):
     name: str

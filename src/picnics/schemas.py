@@ -1,14 +1,14 @@
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, Field, field_validator
 import datetime as dt
-from typing import List, Union
+from typing import List
 
 from src.users.schemas import UserModelSchema
 
 class PicnicInSchema(BaseModel):
     city_id: int
-    time: dt.datetime
+    time: dt.datetime = Field(..., example="2023-09-11 20:00:00")
     
-    @validator('time')
+    @field_validator('time')
     def time_not_past(cls, time):
         if time.timestamp() < dt.datetime.now().timestamp():
             raise ValueError('You cannot create picnic in past')
@@ -17,10 +17,9 @@ class PicnicInSchema(BaseModel):
 class SinglePicnicOutSchema(BaseModel):
     id: int
     city: str
-    time: dt.datetime
+    time: dt.datetime = Field
 
     class Config:
-        orm_mode = True
         from_attributes = True
 
 class ManyPicnicsOutSchema(SinglePicnicOutSchema,):

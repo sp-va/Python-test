@@ -1,11 +1,11 @@
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, field_validator
 
 class RegisterUserRequestSchema(BaseModel):
     name: str
     surname: str
     age: int
 
-    @validator('age')
+    @field_validator('age')
     def age_valid(cls, age):
         if age < 0 or age > 150:
             raise ValueError("Age must be greater than 0 and less than 150!")
@@ -15,5 +15,4 @@ class UserModelSchema(RegisterUserRequestSchema):
     id: int
 
     class Config:
-        orm_mode = True
         from_attributes = True
